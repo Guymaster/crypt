@@ -33,6 +33,12 @@ abstract class Database {
     await box.delete(name);
   }
 
+  updateCollection(String name, Collection collection) async {
+    var db = await getDb();
+    var box = await db.openBox("collections");
+    await box.put(name, collection);
+  }
+
   Future<List<File>> getFiles() async {
     var db = await getDb();
     var box = await db.openBox("files");
@@ -50,10 +56,10 @@ abstract class Database {
     await box.put(file.timestamp.toString(), file);
   }
 
-  deleteFile(File file) async {
+  deleteFile(int timestamp) async {
     var db = await getDb();
     var box = await db.openBox("files");
-    await box.delete(file.timestamp.toString());
+    await box.delete(timestamp.toString());
   }
 }
 
