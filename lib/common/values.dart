@@ -1,6 +1,9 @@
 const HIVE_COLL_NAME = "CRYPT_HIVE";
 const HIVE_BOX_NAME = "CRYPT_BOX";
 
+const WINDOW_HEADER_HEIGHT = 30;
+const WINDOW_SIDEBAR_WIDTH = 200;
+
 enum ItemMode {
   VIEW,
   EDIT,
