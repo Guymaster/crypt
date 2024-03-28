@@ -19,8 +19,8 @@ class RegistryPage extends StatefulWidget {
 
 class RegistryPageState extends State<RegistryPage> {
   List<Collection> collections = [
-    Collection("name"),
-    Collection("nom")
+    Collection("Firebase configd"),
+    Collection("Supase prog"),
   ];
   List<File> files = [
     File("collection_name", "title", "content"),
@@ -38,10 +38,12 @@ class RegistryPageState extends State<RegistryPage> {
   Widget build(BuildContext context){
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        shape: CircleBorder(),
+        mini: MQ.getWidth(context) < 800,
         onPressed: () {
           //
         },
-        child: Text("OK"),
+        child: const Icon(Icons.add),
       ),
       body: Container(
         height: MQ.getHeight(context),
@@ -57,7 +59,12 @@ class RegistryPageState extends State<RegistryPage> {
                   Container(
                     height: WINDOW_HEADER_HEIGHT.toDouble(),
                     width: WINDOW_SIDEBAR_WIDTH.toDouble(),
-                    color: Colors.blueGrey,
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey,
+                      border: Border.all(
+                        width: 0,
+                      )
+                    ),
                     child: Text("crrypt"),
                   ),
                   Row(
@@ -84,14 +91,30 @@ class RegistryPageState extends State<RegistryPage> {
                   Container(
                     width: 200,
                     height: MQ.getHeight(context) - WINDOW_HEADER_HEIGHT,
-                    color: Colors.blueGrey,
+                    decoration: BoxDecoration(
+                        color: Colors.blueGrey,
+                        border: Border.all(
+                          width: 0,
+                          color: Colors.blueGrey,
+                        )
+                    ),
                     child: ListView.builder(
                       itemCount: collections.length,
-                      itemBuilder: (context, i) => CollectionItem(
-                        onPressed: (String name){
-                          //
-                        },
-                        collection: collections[i]
+                      itemBuilder: (context, i) => Padding(
+                        padding: EdgeInsets.only(top: (i == 0)? 10 : 0),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+                              child: CollectionItem(
+                                  onPressed: (String name){
+                                    //
+                                  },
+                                  collection: collections[i]
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -100,7 +123,7 @@ class RegistryPageState extends State<RegistryPage> {
                     height: MQ.getHeight(context) - WINDOW_HEADER_HEIGHT,
                     color: Colors.greenAccent,
                     child: ListView.builder(
-                      itemCount: collections.length,
+                      itemCount: files.length,
                       itemBuilder: (context, i) => FileItem(
                           onPressed: (String name){
                             //
