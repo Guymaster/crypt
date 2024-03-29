@@ -3,6 +3,7 @@ import 'package:crypt/common/dimensions.dart';
 import 'package:crypt/common/values.dart';
 import 'package:crypt/pages/registry/components/collection-item.component.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../models/collection.model.dart';
 import '../../models/file.model.dart';
@@ -38,7 +39,9 @@ class RegistryPageState extends State<RegistryPage> {
   Widget build(BuildContext context){
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        shape: CircleBorder(),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15)
+        ),
         mini: MQ.getWidth(context) < 800,
         onPressed: () {
           //
@@ -48,6 +51,7 @@ class RegistryPageState extends State<RegistryPage> {
       body: Container(
         height: MQ.getHeight(context),
         width: MQ.getWidth(context),
+        color: ColorPalette.getBlack(1),
         child: Column(
           children: [
             SizedBox(
@@ -60,24 +64,36 @@ class RegistryPageState extends State<RegistryPage> {
                     height: WINDOW_HEADER_HEIGHT.toDouble(),
                     width: WINDOW_SIDEBAR_WIDTH.toDouble(),
                     decoration: BoxDecoration(
-                      color: Colors.blueGrey,
+                      color: ColorPalette.getDarkGray(1),
                       border: Border.all(
                         width: 0,
+                        color: ColorPalette.getDarkGray(1)
                       )
                     ),
                     child: Text("crrypt"),
                   ),
                   Row(
                     children: [
-                      IconButton(onPressed: (){
-                        appWindow.minimize();
-                      }, icon: const Icon(Icons.hide_image_outlined)),
+                      IconButton(
+                        onPressed: (){
+                          appWindow.minimize();
+                        },
+                        icon: SvgPicture.asset("assets/icons/hide-window.svg",
+                        height: 15,
+                        width: 15,
+                      )),
                       IconButton(onPressed: (){
                         appWindow.maximizeOrRestore();
-                      }, icon: const Icon(Icons.square_outlined)),
+                      }, icon: SvgPicture.asset("assets/icons/maximize-window.svg",
+                        height: 15,
+                        width: 15,
+                      )),
                       IconButton(onPressed: (){
                         appWindow.close();
-                      }, icon: const Icon(Icons.close)),
+                      }, icon: SvgPicture.asset("assets/icons/close-window.svg",
+                        height: 15,
+                        width: 15,
+                      )),
                     ],
                   )
                 ],
@@ -92,10 +108,10 @@ class RegistryPageState extends State<RegistryPage> {
                     width: 200,
                     height: MQ.getHeight(context) - WINDOW_HEADER_HEIGHT,
                     decoration: BoxDecoration(
-                        color: Colors.blueGrey,
+                        color: ColorPalette.getDarkGray(1),
                         border: Border.all(
                           width: 0,
-                          color: Colors.blueGrey,
+                          color: ColorPalette.getDarkGray(1),
                         )
                     ),
                     child: ListView.builder(
@@ -121,7 +137,7 @@ class RegistryPageState extends State<RegistryPage> {
                   Container(
                     width: MQ.getWidth(context) - WINDOW_SIDEBAR_WIDTH,
                     height: MQ.getHeight(context) - WINDOW_HEADER_HEIGHT,
-                    color: Colors.greenAccent,
+                    color: ColorPalette.getBlack(1),
                     child: ListView.builder(
                       itemCount: files.length,
                       itemBuilder: (context, i) => FileItem(
