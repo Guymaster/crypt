@@ -21,3 +21,23 @@ abstract class CollectionNameTxtStyle {
     );
   }
 }
+
+abstract class FileNameTxtStyle {
+  static TextStyle classic(double size, Color color){
+    return GoogleFonts.poppins(
+        color: color,
+        fontSize: size,
+        fontWeight: FontWeight.bold
+    );
+  }
+}
+
+abstract class FileContentTxtStyle {
+  static TextStyle classic(double size, Color color){
+    return GoogleFonts.poppins(
+        color: color,
+        fontSize: size,
+        fontWeight: FontWeight.w500
+    );
+  }
+}

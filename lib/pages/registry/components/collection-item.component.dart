@@ -1,6 +1,7 @@
 import 'package:crypt/common/styles.dart';
 import 'package:crypt/common/values.dart';
 import 'package:crypt/models/collection.model.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CollectionItem extends StatefulWidget {
@@ -16,6 +17,7 @@ class CollectionItem extends StatefulWidget {
 class _CollectionItemState extends State<CollectionItem> {
   ItemMode mode = ItemMode.VIEW;
   FocusNode focusNode = FocusNode();
+  FocusNode editFieldFocusNode = FocusNode();
   late TextEditingController textEditingController;
 
   @override
@@ -28,6 +30,7 @@ class _CollectionItemState extends State<CollectionItem> {
   @override
   void dispose() {
     focusNode.dispose();
+    editFieldFocusNode.dispose();
     textEditingController.dispose();
     super.dispose();
   }
@@ -98,6 +101,7 @@ class _CollectionItemState extends State<CollectionItem> {
                         onPressed: (){
                           setState(() {
                             mode = ItemMode.EDIT;
+                            editFieldFocusNode.requestFocus();
                           });
                         },
                         iconSize: 15,
@@ -121,7 +125,7 @@ class _CollectionItemState extends State<CollectionItem> {
                               ))
                           ),
                           iconSize: 15,
-                          icon: Icon(Icons.delete)
+                          icon: const Icon(Icons.delete)
                       ),
                     ),
                   ],
@@ -132,6 +136,7 @@ class _CollectionItemState extends State<CollectionItem> {
               height: 35,
               color: ColorPalette.getBlack(1),
               child: TextField(
+                focusNode: editFieldFocusNode,
                 controller: textEditingController,
                 textInputAction: TextInputAction.search,
                 textAlignVertical: TextAlignVertical.center,
@@ -144,7 +149,7 @@ class _CollectionItemState extends State<CollectionItem> {
                   counterText: "",
                   border: InputBorder.none,
                   isDense: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10)
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 7)
 
                 ),
               ),

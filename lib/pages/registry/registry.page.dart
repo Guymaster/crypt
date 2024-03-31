@@ -30,8 +30,12 @@ class RegistryPageState extends State<RegistryPage> {
     Collection("Supase prog"),
   ];
   List<File> files = [
-    File("collection_name", "title", "content"),
-    File("collection_name", "title", "content"),
+    File("collection_name", "Firebase account ids", '''
+This is supposed to be
+a multiline 
+text
+    '''),
+    File("collection_name", "Hello world", "content"),
     File("collection_name", "title", "content"),
   ];
 
@@ -45,6 +49,7 @@ class RegistryPageState extends State<RegistryPage> {
   Widget build(BuildContext context){
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        backgroundColor: ColorPalette.getGray(1),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15)
         ),
@@ -88,6 +93,7 @@ class RegistryPageState extends State<RegistryPage> {
                         )
                       ),
                       child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           SizedBox(width: 10,),
                           Consumer<SecretKeyProvider>(
@@ -173,9 +179,12 @@ class RegistryPageState extends State<RegistryPage> {
                     child: ListView.builder(
                       itemCount: files.length,
                       itemBuilder: (context, i) => FileItem(
-                          onPressed: (String name){
-                            //
+                          handleDelete: (file) async {
+
                           },
+                        handleEdit: (file, data) async {
+
+                        },
                           file: files[i],
                       ),
                     ),
