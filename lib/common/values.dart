@@ -9,6 +9,7 @@ const WINDOW_SIDEBAR_WIDTH = 200;
 enum ItemMode {
   VIEW,
   EDIT,
+  MENU
 }
 
 abstract class ColorPalette {

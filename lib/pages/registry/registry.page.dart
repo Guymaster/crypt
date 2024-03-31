@@ -1,9 +1,14 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:crypt/common/dimensions.dart';
+import 'package:crypt/common/styles.dart';
 import 'package:crypt/common/values.dart';
 import 'package:crypt/pages/registry/components/collection-item.component.dart';
+import 'package:crypt/providers/secret_key.provider.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/collection.model.dart';
 import '../../models/file.model.dart';
@@ -19,6 +24,7 @@ class RegistryPage extends StatefulWidget {
 }
 
 class RegistryPageState extends State<RegistryPage> {
+  int selectedCol = 0;
   List<Collection> collections = [
     Collection("Firebase configd"),
     Collection("Supase prog"),
@@ -54,49 +60,72 @@ class RegistryPageState extends State<RegistryPage> {
         color: ColorPalette.getBlack(1),
         child: Column(
           children: [
-            SizedBox(
-              height: WINDOW_HEADER_HEIGHT.toDouble(),
-              width: MQ.getWidth(context),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    height: WINDOW_HEADER_HEIGHT.toDouble(),
-                    width: WINDOW_SIDEBAR_WIDTH.toDouble(),
-                    decoration: BoxDecoration(
-                      color: ColorPalette.getDarkGray(1),
-                      border: Border.all(
-                        width: 0,
-                        color: ColorPalette.getDarkGray(1)
-                      )
+            GestureDetector(
+              onPanUpdate: (details){
+                appWindow.position = appWindow.position + details.globalPosition;
+              },
+              /*dragStartBehavior: DragStartBehavior.,
+              onHorizontalDragUpdate: (details){
+                appWindow.position = appWindow.position + details.delta;
+              },
+              onVerticalDragUpdate: (details){
+                appWindow.position = appWindow.position + details.delta;
+              },*/
+              child: SizedBox(
+                height: WINDOW_HEADER_HEIGHT.toDouble(),
+                width: MQ.getWidth(context),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      height: WINDOW_HEADER_HEIGHT.toDouble(),
+                      width: WINDOW_SIDEBAR_WIDTH.toDouble(),
+                      decoration: BoxDecoration(
+                        color: ColorPalette.getDarkGray(1),
+                        border: Border.all(
+                          width: 0,
+                          color: ColorPalette.getDarkGray(1)
+                        )
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 10,),
+                          Consumer<SecretKeyProvider>(
+                            builder: (context, provider, widget) => SizedBox(),
+                          ),
+                          Text("Crypt", style: AppNameTxtStyle.classic(14, ColorPalette.getWhite(0.5)),),
+                        ],
+                      ),
                     ),
-                    child: Text("crrypt"),
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: (){
-                          appWindow.minimize();
-                        },
-                        icon: SvgPicture.asset("assets/icons/hide-window.svg",
-                        height: 15,
-                        width: 15,
-                      )),
-                      IconButton(onPressed: (){
-                        appWindow.maximizeOrRestore();
-                      }, icon: SvgPicture.asset("assets/icons/maximize-window.svg",
-                        height: 15,
-                        width: 15,
-                      )),
-                      IconButton(onPressed: (){
-                        appWindow.close();
-                      }, icon: SvgPicture.asset("assets/icons/close-window.svg",
-                        height: 15,
-                        width: 15,
-                      )),
-                    ],
-                  )
-                ],
+                    Flexible(
+                      child: Container(color: ColorPalette.getBlack(0),),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: (){
+                            appWindow.minimize();
+                          },
+                          icon: SvgPicture.asset("assets/icons/hide-window.svg",
+                          height: 15,
+                          width: 15,
+                        )),
+                        IconButton(onPressed: (){
+                          appWindow.maximizeOrRestore();
+                        }, icon: SvgPicture.asset("assets/icons/maximize-window.svg",
+                          height: 15,
+                          width: 15,
+                        )),
+                        IconButton(onPressed: (){
+                          appWindow.close();
+                        }, icon: SvgPicture.asset("assets/icons/close-window.svg",
+                          height: 15,
+                          width: 15,
+                        )),
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
             SizedBox(
@@ -124,9 +153,12 @@ class RegistryPageState extends State<RegistryPage> {
                               padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
                               child: CollectionItem(
                                   onPressed: (String name){
-                                    //
+                                    setState(() {
+                                      selectedCol = i;
+                                    });
                                   },
-                                  collection: collections[i]
+                                  collection: collections[i],
+                                  selected: (i == selectedCol),
                               ),
                             ),
                           ],
