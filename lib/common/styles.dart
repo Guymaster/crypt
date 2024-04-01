@@ -41,3 +41,23 @@ abstract class FileContentTxtStyle {
     );
   }
 }
+
+abstract class FormLabelTxtStyle {
+  static TextStyle classic(double size, Color color){
+    return GoogleFonts.poppins(
+        color: color,
+        fontSize: size,
+        fontWeight: FontWeight.w500,
+    );
+  }
+}
+
+abstract class FormTitleTxtStyle {
+  static TextStyle classic(double size, Color color){
+    return GoogleFonts.poppins(
+        color: color,
+        fontSize: size,
+        fontWeight: FontWeight.bold
+    );
+  }
+}

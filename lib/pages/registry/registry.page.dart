@@ -3,6 +3,7 @@ import 'package:crypt/common/dimensions.dart';
 import 'package:crypt/common/styles.dart';
 import 'package:crypt/common/values.dart';
 import 'package:crypt/pages/registry/components/collection-item.component.dart';
+import 'package:crypt/pages/registry/components/file-create-popup.component.dart';
 import 'package:crypt/providers/secret_key.provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -55,7 +56,12 @@ text
         ),
         mini: MQ.getWidth(context) < 800,
         onPressed: () {
-          //
+          showDialog(
+            context: context,
+            builder: (context){
+              return CreateFilePopUp();
+            }
+          );
         },
         child: const Icon(Icons.add),
       ),
@@ -93,13 +99,29 @@ text
                         )
                       ),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          SizedBox(width: 10,),
-                          Consumer<SecretKeyProvider>(
-                            builder: (context, provider, widget) => SizedBox(),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              const SizedBox(width: 10,),
+                              Text("Crypt", style: AppNameTxtStyle.classic(14, ColorPalette.getWhite(0.5)),),
+                            ],
                           ),
-                          Text("Crypt", style: AppNameTxtStyle.classic(14, ColorPalette.getWhite(0.5)),),
+                          Consumer<SecretKeyProvider>(
+                            builder: (context, provider, widget) => IconButton(
+                              style: ButtonStyle(
+                                shape: MaterialStateProperty.all(const RoundedRectangleBorder())
+                              ),
+                              color: (provider.value.isEmpty? Colors.red : ColorPalette.getWhite(0.7)),
+                              iconSize: 17,
+                              onPressed: (){
+
+                              },
+                              icon: Icon((provider.value.isEmpty? Icons.lock : Icons.lock_open))
+                            ),
+                          )
                         ],
                       ),
                     ),
