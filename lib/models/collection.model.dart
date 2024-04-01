@@ -1,6 +1,6 @@
 
 class Collection {
-  int id = 0;
+  int id;
   String name;
   int? createdAt = DateTime.timestamp().millisecondsSinceEpoch;
   int? updatedAt = DateTime.timestamp().millisecondsSinceEpoch;

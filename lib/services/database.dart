@@ -61,15 +61,16 @@ abstract class DbService {
     ];
   }
 
-  static addCollection(({
+  static Future<int> addCollection(({
     String name
   }) data) async {
     final Database db = await getDb();
-    await db.insert("collection", {
+    int id = await db.insert("collection", {
       "name": data.name,
       "created_at": DateTime.now().millisecondsSinceEpoch,
       "updated_at": DateTime.now().millisecondsSinceEpoch
     }, conflictAlgorithm: ConflictAlgorithm.abort);
+    return id;
   }
 
   static deleteCollection(int collectionId) async {
@@ -113,18 +114,20 @@ abstract class DbService {
     ];
   }
 
-  static addFile(({
+  static Future<int> addFile(({
     String title,
     String content,
-    int collectionIid
+    int collectionId
   }) data) async {
     final Database db = await getDb();
-    await db.insert("file", {
+    int id = await db.insert("file", {
       "title": data.title,
       "content": data.content,
+      "collection_id": data.collectionId,
       "created_at": DateTime.now().millisecondsSinceEpoch,
       "updated_at": DateTime.now().millisecondsSinceEpoch
     }, conflictAlgorithm: ConflictAlgorithm.abort);
+    return id;
   }
 
   static updateFile(int fileId, ({

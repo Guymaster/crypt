@@ -1,9 +1,14 @@
 import 'package:crypt/common/styles.dart';
+import 'package:crypt/common/validators.dart';
 import 'package:crypt/common/values.dart';
 import 'package:crypt/models/collection.model.dart';
+import 'package:crypt/services/database.dart';
 import 'package:flutter/material.dart';
 
 class CreateFilePopUp extends StatefulWidget {
+  final void Function() onCreateFile;
+  const CreateFilePopUp({super.key, required this.onCreateFile});
+
   @override
   State<StatefulWidget> createState() {
     return CreateFilePopUpState();
@@ -12,17 +17,38 @@ class CreateFilePopUp extends StatefulWidget {
 }
 
 class CreateFilePopUpState extends State<CreateFilePopUp> {
+  final _formKey = GlobalKey<FormState>();
   bool shouldCreateNewCollection = false;
-  List<Collection> collections = [
-    Collection(
-      id: 1,
-      name: "Firebase"
-    ),
-    Collection(
-        id: 1,
-        name: "Supabase"
-    ),
-  ];
+  Collection? selectedCollection;
+  late TextEditingController fileTitleController;
+  late TextEditingController fileContentController;
+  late TextEditingController collectionNameController;
+
+  List<Collection> collections = [];
+
+  Future<void> fetchCollections() async {
+    List<Collection> cls = await DbService.getCollections();
+    setState(() {
+      collections = cls;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fileTitleController = TextEditingController();
+    fileContentController = TextEditingController();
+    collectionNameController = TextEditingController();
+    fetchCollections();
+  }
+
+  @override
+  void dispose() {
+    fileContentController.dispose();
+    fileTitleController.dispose();
+    collectionNameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +71,37 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
                   borderRadius: BorderRadius.circular(5)
               ))
           ),
-          onPressed: (){
-            //
+          onPressed: () async {
+            bool? isFormValid = _formKey.currentState?.validate();
+            if(isFormValid == null || !isFormValid){
+              return;
+            }
+            Navigator.of(context).pop();
+            if(shouldCreateNewCollection){
+              try{
+                int collectionId = await DbService.addCollection((name: collectionNameController.value.text));
+                await DbService.addFile((title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: collectionId));
+              } catch(e){
+                  print(e);
+                //
+              }
+              finally {
+                widget.onCreateFile();
+              }
+            }
+            else {
+              try{
+                await DbService.addFile((title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: selectedCollection!.id));
+              } catch(e){
+                print(e);
+                //
+              }
+              finally {
+                widget.onCreateFile();
+              }
+            }
           },
-          child: Text("Encrypt it", style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),),
+          child: Text("Encrypt & Save", style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),),
         ),
       ],
       backgroundColor: ColorPalette.getBlack(1),
@@ -60,13 +113,17 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
         width: 600,
         child: SingleChildScrollView(
           child: Form(
+            key: _formKey,
             child: Column(
               children: [
                 TextFormField(
+                  controller: fileTitleController,
+                  validator: entityNameValidator,
                   style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: ColorPalette.getBlack(0.5),
+                    hoverColor: ColorPalette.getBlack(0.5),
                     labelText: "Title",
                     labelStyle: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),
                     border: InputBorder.none
@@ -74,6 +131,7 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
                 ),
                 const SizedBox(height: 10,),
                 TextFormField(
+                  controller: fileContentController,
                   minLines: 10,
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
@@ -81,6 +139,7 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: ColorPalette.getBlack(0.5),
+                    hoverColor: ColorPalette.getBlack(0.5),
                     labelText: "Content",
                     labelStyle: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),
                     border: InputBorder.none,
@@ -103,11 +162,14 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
                 ),
                 const SizedBox(height: 10,),
                 TextFormField(
+                  controller: collectionNameController,
+                  validator: (shouldCreateNewCollection? entityNameValidator : (v)=>null),
                   enabled: shouldCreateNewCollection,
                   style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),
                   decoration: InputDecoration(
                       filled: true,
                       fillColor: shouldCreateNewCollection? ColorPalette.getBlack(0.5) : ColorPalette.getBlack(0.2),
+                      hoverColor: shouldCreateNewCollection? ColorPalette.getBlack(0.5) : ColorPalette.getBlack(0.2),
                       labelText: "New collection name",
                       labelStyle: shouldCreateNewCollection? FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)) : FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.2)),
                       border: InputBorder.none
@@ -115,9 +177,19 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
                 ),
                 const SizedBox(height: 10,),
                 DropdownButtonFormField<Collection>(
+                  validator: (collection){
+                    if(shouldCreateNewCollection){
+                      return null;
+                    }
+                    if(collection == null){
+                      return "Don't forget to choose a collection";
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: !shouldCreateNewCollection? ColorPalette.getBlack(0.5) : ColorPalette.getBlack(0.2),
+                    hoverColor: !shouldCreateNewCollection? ColorPalette.getBlack(0.5) : ColorPalette.getBlack(0.2),
                     labelText: "Select a collection",
                     labelStyle: !shouldCreateNewCollection? FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)) : FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.2)),
                     border: InputBorder.none
@@ -127,8 +199,11 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
                     value: collection,
                     child: Text(collection.name, style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),)),
                   ).toList(),
+                  value: selectedCollection,
                   onChanged: (collection){
-                    //
+                    setState(() {
+                      selectedCollection = collection;
+                    });
                   },
                 ),
               ],

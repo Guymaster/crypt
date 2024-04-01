@@ -35,17 +35,21 @@ class RegistryPageState extends State<RegistryPage> {
   void initState(){
     super.initState();
     fetchCollections();
-    fetchFiles();
   }
 
   Future<void> fetchCollections() async {
-    List cls = await DbService.getCollections();
-    print(cls);
+    List<Collection> cls = await DbService.getCollections();
+    setState(() {
+      collections = cls;
+    });
+    fetchFiles();
   }
 
   Future<void> fetchFiles() async {
-    List fls = await DbService.getFiles(0);
-    print(fls);
+    List<File> fls = await DbService.getFiles(collections[selectedCol].id);
+    setState(() {
+      files = fls;
+    });
     //C:\Users\LENOVO\StudioProjects\crypt\.dart_tool\sqflite_common_ffi\databases
   }
 
@@ -63,7 +67,11 @@ class RegistryPageState extends State<RegistryPage> {
           showDialog(
             context: context,
             builder: (context){
-              return CreateFilePopUp();
+              return CreateFilePopUp(
+                onCreateFile: (){
+                  fetchCollections();
+                },
+              );
             }
           );
         },
@@ -200,6 +208,7 @@ class RegistryPageState extends State<RegistryPage> {
                                     setState(() {
                                       selectedCol = i;
                                     });
+                                    fetchFiles();
                                   },
                                   collection: collections[i],
                                   selected: (i == selectedCol),
