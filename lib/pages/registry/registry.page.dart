@@ -5,11 +5,13 @@ import 'package:crypt/common/values.dart';
 import 'package:crypt/pages/registry/components/collection-item.component.dart';
 import 'package:crypt/pages/registry/components/file-create-popup.component.dart';
 import 'package:crypt/providers/secret_key.provider.dart';
+import 'package:crypt/services/database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../../models/collection.model.dart';
 import '../../models/file.model.dart';
@@ -26,23 +28,25 @@ class RegistryPage extends StatefulWidget {
 
 class RegistryPageState extends State<RegistryPage> {
   int selectedCol = 0;
-  List<Collection> collections = [
-    Collection("Firebase configd"),
-    Collection("Supase prog"),
-  ];
-  List<File> files = [
-    File("collection_name", "Firebase account ids", '''
-This is supposed to be
-a multiline 
-text
-    '''),
-    File("collection_name", "Hello world", "content"),
-    File("collection_name", "title", "content"),
-  ];
+  List<Collection> collections = [];
+  List<File> files = [];
 
   @override
   void initState(){
     super.initState();
+    fetchCollections();
+    fetchFiles();
+  }
+
+  Future<void> fetchCollections() async {
+    List cls = await DbService.getCollections();
+    print(cls);
+  }
+
+  Future<void> fetchFiles() async {
+    List fls = await DbService.getFiles(0);
+    print(fls);
+    //C:\Users\LENOVO\StudioProjects\crypt\.dart_tool\sqflite_common_ffi\databases
   }
 
 
@@ -131,6 +135,9 @@ text
                     Row(
                       children: [
                         IconButton(
+                          style: ButtonStyle(
+                            shape: MaterialStateProperty.all(const RoundedRectangleBorder())
+                          ),
                           onPressed: (){
                             appWindow.minimize();
                           },
@@ -138,15 +145,24 @@ text
                           height: 15,
                           width: 15,
                         )),
-                        IconButton(onPressed: (){
+                        IconButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(const RoundedRectangleBorder())
+                          ),
+                          onPressed: (){
                           appWindow.maximizeOrRestore();
                         }, icon: SvgPicture.asset("assets/icons/maximize-window.svg",
                           height: 15,
                           width: 15,
                         )),
-                        IconButton(onPressed: (){
-                          appWindow.close();
-                        }, icon: SvgPicture.asset("assets/icons/close-window.svg",
+                        IconButton(
+                          onPressed: (){
+                            appWindow.close();
+                          },
+                          style: ButtonStyle(
+                              shape: MaterialStateProperty.all(const RoundedRectangleBorder())
+                          ),
+                          icon: SvgPicture.asset("assets/icons/close-window.svg",
                           height: 15,
                           width: 15,
                         )),

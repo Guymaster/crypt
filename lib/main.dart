@@ -3,12 +3,15 @@ import 'package:crypt/common/themes.dart';
 import 'package:crypt/pages/login/login.page.dart';
 import 'package:crypt/pages/registry/registry.page.dart';
 import 'package:crypt/providers/secret_key.provider.dart';
+import 'package:crypt/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
-
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
   doWhenWindowReady(() {
     const initialSize = Size(600, 450);
     appWindow.minSize = initialSize;

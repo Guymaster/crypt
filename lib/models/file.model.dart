@@ -1,18 +1,10 @@
-import 'package:hive/hive.dart';
-
-@HiveType(typeId: 1)
-class File extends HiveObject {
-  @HiveField(0)
-  String title;
-
-  @HiveField(1)
-  String collection_name;
-
-  @HiveField(2)
+class File {
+  int id;
   String content;
+  String title;
+  int collectionId;
+  int? createdAt = DateTime.timestamp().millisecondsSinceEpoch;
+  int? updatedAt = DateTime.timestamp().millisecondsSinceEpoch;
 
-  @HiveField(3)
-  int timestamp = DateTime.timestamp().millisecondsSinceEpoch;
-
-  File(this.collection_name, this.title, this.content);
+  File({required this.id, required this.collectionId, required this.title, required this.content, this.createdAt, this.updatedAt});
 }

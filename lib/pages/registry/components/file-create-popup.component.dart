@@ -14,8 +14,14 @@ class CreateFilePopUp extends StatefulWidget {
 class CreateFilePopUpState extends State<CreateFilePopUp> {
   bool shouldCreateNewCollection = false;
   List<Collection> collections = [
-    Collection("Firebase configd"),
-    Collection("Supase prog"),
+    Collection(
+      id: 1,
+      name: "Firebase"
+    ),
+    Collection(
+        id: 1,
+        name: "Supabase"
+    ),
   ];
 
   @override
@@ -116,7 +122,7 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
                     labelStyle: !shouldCreateNewCollection? FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)) : FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.2)),
                     border: InputBorder.none
                   ),
-                  dropdownColor: ColorPalette.getBlack(0.7),
+                  dropdownColor: ColorPalette.getBlack(0.9),
                   items: shouldCreateNewCollection? [] : collections.map((collection) => DropdownMenuItem<Collection>(
                     value: collection,
                     child: Text(collection.name, style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),)),
