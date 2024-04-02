@@ -61,6 +61,28 @@ abstract class DbService {
     ];
   }
 
+  static Future<Collection> getCollectionById(int collectionId) async {
+    final Database db = await getDb();
+    final List<Map<String, Object?>> fileMaps = await db.query("collection",
+        where: "id=$collectionId"
+    );
+    List<Collection> collections = [
+      for (final {
+      'id': id as int,
+      'name': name as String,
+      'created_at': created_at as int,
+      'updated_at': updated_at as int
+      } in fileMaps)
+        Collection(
+            id: id,
+            name: name,
+            createdAt: created_at,
+            updatedAt: updated_at,
+        ),
+    ];
+    return collections[0];
+  }
+
   static Future<int> addCollection(({
     String name
   }) data) async {
@@ -75,6 +97,7 @@ abstract class DbService {
 
   static deleteCollection(int collectionId) async {
     final Database db = await getDb();
+    await db.delete("file", where: "collection_id=$collectionId");
     await db.delete("collection", where: "id=$collectionId");
   }
 
@@ -114,6 +137,32 @@ abstract class DbService {
     ];
   }
 
+  static Future<File> getFileById(int fileId) async {
+    final Database db = await getDb();
+    final List<Map<String, Object?>> fileMaps = await db.query("file",
+        where: "id=$fileId"
+    );
+    List<File> files = [
+      for (final {
+      'id': id as int,
+      'title': title as String,
+      'content': content as String,
+      'collection_id': collection_id as int,
+      'created_at': created_at as int,
+      'updated_at': updated_at as int
+      } in fileMaps)
+        File(
+            id: id,
+            title: title,
+            createdAt: created_at,
+            updatedAt: updated_at,
+            collectionId: collection_id,
+            content: content
+        ),
+    ];
+    return files[0];
+  }
+
   static Future<int> addFile(({
     String title,
     String content,
@@ -136,8 +185,8 @@ abstract class DbService {
   int collectionId
   }) data) async {
     final Database db = await getDb();
-    await db.update("collection", {
-      "name": data.title,
+    await db.update("file", {
+      "title": data.title,
       "content": data.content,
       "collection_id": data.collectionId,
       "updated_at": DateTime.now().millisecondsSinceEpoch

@@ -27,7 +27,7 @@ abstract class FileNameTxtStyle {
     return GoogleFonts.poppins(
         color: color,
         fontSize: size,
-        fontWeight: FontWeight.bold
+        fontWeight: FontWeight.w500
     );
   }
 }
@@ -37,7 +37,7 @@ abstract class FileContentTxtStyle {
     return GoogleFonts.poppins(
         color: color,
         fontSize: size,
-        fontWeight: FontWeight.w500
+        fontWeight: FontWeight.w400
     );
   }
 }

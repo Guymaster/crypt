@@ -15,6 +15,8 @@ import 'package:sqflite/sqflite.dart';
 
 import '../../models/collection.model.dart';
 import '../../models/file.model.dart';
+import 'components/file-delete-popup.component.dart';
+import 'components/file-edit-popup.component.dart';
 import 'components/file-item.component.dart';
 
 class RegistryPage extends StatefulWidget {
@@ -42,7 +44,14 @@ class RegistryPageState extends State<RegistryPage> {
     setState(() {
       collections = cls;
     });
-    fetchFiles();
+    if(collections.length > selectedCol){
+      fetchFiles();
+    }
+    else{
+      setState(() {
+        files = [];
+      });
+    }
   }
 
   Future<void> fetchFiles() async {
@@ -204,14 +213,20 @@ class RegistryPageState extends State<RegistryPage> {
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
                               child: CollectionItem(
-                                  onPressed: (String name){
-                                    setState(() {
-                                      selectedCol = i;
-                                    });
-                                    fetchFiles();
-                                  },
-                                  collection: collections[i],
-                                  selected: (i == selectedCol),
+                                onPressed: (String name){
+                                  setState(() {
+                                    selectedCol = i;
+                                  });
+                                  fetchFiles();
+                                },
+                                handleEdit: (c) async {
+                                    fetchCollections();
+                                },
+                                handleDelete: (c) async {
+                                  fetchCollections();
+                                },
+                                collection: collections[i],
+                                selected: (i == selectedCol),
                               ),
                             ),
                           ],
@@ -226,11 +241,30 @@ class RegistryPageState extends State<RegistryPage> {
                     child: ListView.builder(
                       itemCount: files.length,
                       itemBuilder: (context, i) => FileItem(
-                          handleDelete: (file) async {
-
-                          },
-                        handleEdit: (file, data) async {
-
+                        handleDelete: (file) async {
+                          showDialog(
+                              context: context,
+                              builder: (context){
+                                return DeleteFilePopUp(
+                                  onDeleteFile: (){
+                                    fetchCollections();
+                                  }, fileId: file.id,
+                                );
+                              }
+                          );
+                        },
+                        handleEdit: (file) async {
+                          showDialog(
+                              context: context,
+                              builder: (context){
+                                return EditFilePopUp(
+                                  defaultCollectionId: selectedCol,
+                                  onEditFile: (){
+                                    fetchCollections();
+                                  }, fileId: file.id,
+                                );
+                              }
+                          );
                         },
                           file: files[i],
                       ),

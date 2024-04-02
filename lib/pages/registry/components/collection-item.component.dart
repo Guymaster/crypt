@@ -1,14 +1,20 @@
 import 'package:crypt/common/styles.dart';
 import 'package:crypt/common/values.dart';
 import 'package:crypt/models/collection.model.dart';
+import 'package:crypt/services/database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:crypt/models/file.model.dart';
+
+import 'collection-delete-popup.component.dart';
 
 class CollectionItem extends StatefulWidget {
   Collection collection;
+  Future<void> Function(Collection file) handleEdit;
+  Future<void> Function(Collection file) handleDelete;
   void Function(String name) onPressed;
   bool? selected = false;
-  CollectionItem({super.key, required this.onPressed, required this.collection, this.selected});
+  CollectionItem({super.key, required this.onPressed, required this.collection, this.selected, required this.handleDelete, required this.handleEdit});
 
   @override
   State<CollectionItem> createState() => _CollectionItemState();
@@ -117,7 +123,17 @@ class _CollectionItemState extends State<CollectionItem> {
                       padding: const EdgeInsets.all(2),
                       child: IconButton(
                           onPressed: (){
-                            //
+                            showDialog(
+                                context: context,
+                                builder: (context){
+                                  return DeleteCollectionPopUp(
+                                    collectionId: widget.collection.id,
+                                    onDeleteCollection: (){
+                                      widget.handleDelete(widget.collection);
+                                    },
+                                  );
+                                }
+                            );
                           },
                           style: ButtonStyle(
                               shape: MaterialStateProperty.all(RoundedRectangleBorder(
@@ -141,8 +157,22 @@ class _CollectionItemState extends State<CollectionItem> {
                 textInputAction: TextInputAction.search,
                 textAlignVertical: TextAlignVertical.center,
                 maxLength: 50,
-                onSubmitted: (value){
-                  //
+                onSubmitted: (value) async {
+                  if(value.isNotEmpty && value.length > 3 && value.length <= 50){
+                    try{
+                      await DbService.updateCollection(widget.collection.id, (name: value));
+                    }
+                    catch(e){
+                      textEditingController.text = widget.collection.name;
+                      print(e);
+                    }
+                    finally{
+                      widget.handleEdit(widget.collection);
+                    }
+                  }
+                  else{
+                    textEditingController.text = widget.collection.name;
+                  }
                 },
                 style: CollectionNameTxtStyle.classic(14, ColorPalette.getWhite(1)),
                 decoration: const InputDecoration(

@@ -11,7 +11,7 @@ import 'file-item-menu.component.dart';
 
 class FileItem extends StatefulWidget {
   File file;
-  Future<void> Function(File file, ({String title, String content}) data) handleEdit;
+  Future<void> Function(File file) handleEdit;
   Future<void> Function(File file) handleDelete;
   FileItem({super.key, required this.handleEdit, required this.handleDelete, required this.file});
 
@@ -39,14 +39,15 @@ class _FileItemState extends State<FileItem> {
           FileItemMenu((){
             Clipboard.setData(ClipboardData(text: widget.file.content));
           }, (){
-            //
+            widget.handleEdit(widget.file);
           }, (){
-            //
+            widget.handleDelete(widget.file);
           }),
           placement: Placement.bottomLeft,
         );
       },
       child: Card(
+        elevation: 0,
         color: ColorPalette.getDarkGray(0.5),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(5))
