@@ -4,6 +4,7 @@ import 'package:crypt/common/styles.dart';
 import 'package:crypt/common/values.dart';
 import 'package:crypt/pages/registry/components/collection-item.component.dart';
 import 'package:crypt/pages/registry/components/file-create-popup.component.dart';
+import 'package:crypt/pages/welcome/welcome.page.dart';
 import 'package:crypt/providers/secret_key.provider.dart';
 import 'package:crypt/services/database.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,6 +19,7 @@ import '../../models/file.model.dart';
 import 'components/file-delete-popup.component.dart';
 import 'components/file-edit-popup.component.dart';
 import 'components/file-item.component.dart';
+import 'components/unlock-popup.component.dart';
 
 class RegistryPage extends StatefulWidget {
   const RegistryPage({super.key});
@@ -36,6 +38,7 @@ class RegistryPageState extends State<RegistryPage> {
   @override
   void initState(){
     super.initState();
+    checkHash();
     fetchCollections();
   }
 
@@ -51,6 +54,15 @@ class RegistryPageState extends State<RegistryPage> {
       setState(() {
         files = [];
       });
+    }
+  }
+
+  Future<void> checkHash() async {
+    String? hash = await DbService.getHash();
+    if(hash == null){
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => WelcomePage()
+      ));
     }
   }
 
@@ -135,10 +147,18 @@ class RegistryPageState extends State<RegistryPage> {
                               style: ButtonStyle(
                                 shape: MaterialStateProperty.all(const RoundedRectangleBorder())
                               ),
-                              color: (provider.value.isEmpty? Colors.red : ColorPalette.getWhite(0.7)),
+                              color: (provider.value.isEmpty? Colors.red : ColorPalette.getWhite(0.3)),
                               iconSize: 17,
                               onPressed: (){
-
+                                Provider.of<SecretKeyProvider>(context, listen: false).value.isEmpty?
+                                  showDialog(
+                                      context: context,
+                                      builder: (context){
+                                        return const UnlockPopUp();
+                                      }
+                                  )
+                                :
+                                Provider.of<SecretKeyProvider>(context, listen: false).value = "";
                               },
                               icon: Icon((provider.value.isEmpty? Icons.lock : Icons.lock_open))
                             ),

@@ -20,7 +20,7 @@ class EditFilePopUp extends StatefulWidget {
 }
 
 class EditFilePopUpState extends State<EditFilePopUp> {
-  final _formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   File? defaultFileData;
   
   bool shouldCreateNewCollection = false;

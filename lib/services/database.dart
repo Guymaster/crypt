@@ -32,6 +32,12 @@ abstract class DbService {
               ' created_at DATETIME DEFAULT (current_timestamp) NOT NULL,'
               ' updated_at DATETIME DEFAULT (current_timestamp) NOT NULL'
               ')');
+          await db.execute('CREATE TABLE setting('
+              ' key VARCHAR(50) PRIMARY KEY,'
+              ' value TEXT NOT NULL,'
+              ' created_at DATETIME DEFAULT (current_timestamp) NOT NULL,'
+              ' updated_at DATETIME DEFAULT (current_timestamp) NOT NULL'
+              ')');
         }
     );
     _db = db;
@@ -107,7 +113,6 @@ abstract class DbService {
     final Database db = await getDb();
     await db.update("collection", {
       "name": data.name,
-      "created_at": DateTime.now().millisecondsSinceEpoch,
       "updated_at": DateTime.now().millisecondsSinceEpoch
     }, where: "id=$collectionId"
     );
@@ -197,5 +202,40 @@ abstract class DbService {
   static deleteFile(int fileId) async {
     final Database db = await getDb();
     await db.delete("file", where: "id=$fileId");
+  }
+
+  static Future<String?> getHash() async {
+    final Database db = await getDb();
+    final List<Map<String, Object?>> settingMaps = await db.query("setting",
+        where: "key='hash'"
+    );
+    List<({String key, String value})> settings = [
+      for (final {
+      'key': key as String,
+      'value': value as String,
+      } in settingMaps)
+        (key: key, value: value),
+    ];
+    return settings.isEmpty? null : settings[0].value;
+  }
+
+  static Future<int> addHash(String value) async {
+    final Database db = await getDb();
+    int id = await db.insert("setting", {
+      "key": "hash",
+      "value": value,
+      "created_at": DateTime.now().millisecondsSinceEpoch,
+      "updated_at": DateTime.now().millisecondsSinceEpoch
+    }, conflictAlgorithm: ConflictAlgorithm.abort);
+    return id;
+  }
+
+  static updateHash(String value) async {
+    final Database db = await getDb();
+    await db.update("setting", {
+      "value": value,
+      "updated_at": DateTime.now().millisecondsSinceEpoch
+    }, where: "key='hash'"
+    );
   }
 }

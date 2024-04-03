@@ -43,6 +43,7 @@ dependencies:
   contextual_menu: ^0.1.2
   sqflite: ^2.3.2
   sqflite_common_ffi: ^2.3.3
+  dbcrypt: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -18,7 +18,7 @@ class DeleteCollectionPopUp extends StatefulWidget {
 }
 
 class DeleteCollectionPopUpState extends State<DeleteCollectionPopUp> {
-  final _formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Collection? collection;
   late TextEditingController textEditingController;
 
@@ -39,6 +39,7 @@ class DeleteCollectionPopUpState extends State<DeleteCollectionPopUp> {
 
   @override
   void dispose() {
+    textEditingController.dispose();
     super.dispose();
   }
 

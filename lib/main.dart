@@ -1,6 +1,6 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:crypt/common/themes.dart';
-import 'package:crypt/pages/login/login.page.dart';
+import 'package:crypt/pages/welcome/welcome.page.dart';
 import 'package:crypt/pages/registry/registry.page.dart';
 import 'package:crypt/providers/secret_key.provider.dart';
 import 'package:crypt/services/database.dart';

@@ -17,7 +17,7 @@ class CreateFilePopUp extends StatefulWidget {
 }
 
 class CreateFilePopUpState extends State<CreateFilePopUp> {
-  final _formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool shouldCreateNewCollection = false;
   Collection? selectedCollection;
   late TextEditingController fileTitleController;

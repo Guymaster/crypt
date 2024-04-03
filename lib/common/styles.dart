@@ -50,6 +50,14 @@ abstract class FormLabelTxtStyle {
         fontWeight: FontWeight.w500,
     );
   }
+
+  static TextStyle bold(double size, Color color){
+    return GoogleFonts.poppins(
+      color: color,
+      fontSize: size,
+      fontWeight: FontWeight.bold,
+    );
+  }
 }
 
 abstract class FormTitleTxtStyle {
