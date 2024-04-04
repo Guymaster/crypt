@@ -12,8 +12,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
-
 import '../../models/collection.model.dart';
 import '../../models/file.model.dart';
 import 'components/file-delete-popup.component.dart';
@@ -61,7 +59,7 @@ class RegistryPageState extends State<RegistryPage> {
     String? hash = await DbService.getHash();
     if(hash == null){
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => WelcomePage()
+        builder: (context) => const WelcomePage()
       ));
     }
   }
@@ -78,25 +76,28 @@ class RegistryPageState extends State<RegistryPage> {
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: ColorPalette.getGray(1),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15)
+      floatingActionButton: Consumer<SecretKeyProvider>(
+        builder: (context, secretKeyProvider, child) => FloatingActionButton(
+          backgroundColor: ColorPalette.getGray(1),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15)
+          ),
+          mini: MQ.getWidth(context) < 800,
+          onPressed: () {
+            if(secretKeyProvider.value.isEmpty) return;
+            showDialog(
+              context: context,
+              builder: (context){
+                return CreateFilePopUp(
+                  onCreateFile: (){
+                    fetchCollections();
+                  },
+                );
+              }
+            );
+          },
+          child: const Icon(Icons.add),
         ),
-        mini: MQ.getWidth(context) < 800,
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context){
-              return CreateFilePopUp(
-                onCreateFile: (){
-                  fetchCollections();
-                },
-              );
-            }
-          );
-        },
-        child: const Icon(Icons.add),
       ),
       body: Container(
         height: MQ.getHeight(context),

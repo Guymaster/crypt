@@ -2,8 +2,10 @@ import 'package:crypt/common/styles.dart';
 import 'package:crypt/common/validators.dart';
 import 'package:crypt/common/values.dart';
 import 'package:crypt/models/collection.model.dart';
+import 'package:crypt/providers/secret_key.provider.dart';
 import 'package:crypt/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CreateFilePopUp extends StatefulWidget {
   final void Function() onCreateFile;
@@ -79,8 +81,8 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
             Navigator.of(context).pop();
             if(shouldCreateNewCollection){
               try{
-                int collectionId = await DbService.addCollection((name: collectionNameController.value.text));
-                await DbService.addFile((title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: collectionId));
+                int collectionId = await DbService.addCollection((name: collectionNameController.value.text), Provider.of<SecretKeyProvider>(context, listen: false).value);
+                await DbService.addFile((title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: collectionId), Provider.of<SecretKeyProvider>(context, listen: false).value);
               } catch(e){
                   print(e);
                 //
@@ -91,7 +93,7 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
             }
             else {
               try{
-                await DbService.addFile((title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: selectedCollection!.id));
+                await DbService.addFile((title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: selectedCollection!.id), Provider.of<SecretKeyProvider>(context, listen: false).value);
               } catch(e){
                 print(e);
                 //

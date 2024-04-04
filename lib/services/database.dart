@@ -1,6 +1,7 @@
 import 'package:crypt/common/values.dart';
 import 'package:crypt/models/collection.model.dart';
 import 'package:crypt/models/file.model.dart';
+import 'package:crypt/services/encryption.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -91,10 +92,10 @@ abstract class DbService {
 
   static Future<int> addCollection(({
     String name
-  }) data) async {
+  }) data, String key) async {
     final Database db = await getDb();
     int id = await db.insert("collection", {
-      "name": data.name,
+      "name": EncryptionService.encode(data.name, key),
       "created_at": DateTime.now().millisecondsSinceEpoch,
       "updated_at": DateTime.now().millisecondsSinceEpoch
     }, conflictAlgorithm: ConflictAlgorithm.abort);
@@ -109,10 +110,10 @@ abstract class DbService {
 
   static updateCollection(int collectionId, ({
     String name
-  }) data) async {
+  }) data, String key) async {
     final Database db = await getDb();
     await db.update("collection", {
-      "name": data.name,
+      "name": EncryptionService.encode(data.name, key),
       "updated_at": DateTime.now().millisecondsSinceEpoch
     }, where: "id=$collectionId"
     );
@@ -172,11 +173,11 @@ abstract class DbService {
     String title,
     String content,
     int collectionId
-  }) data) async {
+  }) data, String key) async {
     final Database db = await getDb();
     int id = await db.insert("file", {
-      "title": data.title,
-      "content": data.content,
+      "title": EncryptionService.encode(data.title, key),
+      "content": EncryptionService.encode(data.content, key),
       "collection_id": data.collectionId,
       "created_at": DateTime.now().millisecondsSinceEpoch,
       "updated_at": DateTime.now().millisecondsSinceEpoch
@@ -188,11 +189,11 @@ abstract class DbService {
   String title,
   String content,
   int collectionId
-  }) data) async {
+  }) data, String key) async {
     final Database db = await getDb();
     await db.update("file", {
-      "title": data.title,
-      "content": data.content,
+      "titile": EncryptionService.encode(data.title, key),
+      "content": EncryptionService.encode(data.content, key),
       "collection_id": data.collectionId,
       "updated_at": DateTime.now().millisecondsSinceEpoch
     }, where: "id=$fileId"

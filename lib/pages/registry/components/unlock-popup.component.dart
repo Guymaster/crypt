@@ -73,6 +73,7 @@ class UnlockPopUpState extends State<UnlockPopUp> {
                     return "Where is the secret key?";
                   }
                 },
+                autofocus: true,
                 decoration: InputDecoration(
                     errorMaxLines: 2,
                     errorStyle: FormLabelTxtStyle.classic(14, Colors.deepOrange),

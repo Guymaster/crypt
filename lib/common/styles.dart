@@ -69,3 +69,14 @@ abstract class FormTitleTxtStyle {
     );
   }
 }
+
+abstract class EncryptedTxtStyle {
+  static TextStyle classic(double size, Color color){
+    return TextStyle(
+        color: color,
+        fontSize: size,
+        fontWeight: FontWeight.bold,
+      fontFamily: "Dethek"
+    );
+  }
+}
