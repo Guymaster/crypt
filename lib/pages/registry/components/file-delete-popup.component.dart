@@ -2,13 +2,15 @@ import 'package:crypt/common/styles.dart';
 import 'package:crypt/common/values.dart';
 import 'package:crypt/models/collection.model.dart';
 import 'package:crypt/services/database.dart';
+import 'package:crypt/services/encryption.dart';
 import 'package:flutter/material.dart';
 import 'package:crypt/models/file.model.dart';
 
 class DeleteFilePopUp extends StatefulWidget {
   final void Function() onDeleteFile;
+  final String secretKey;
   final int fileId;
-  const DeleteFilePopUp({super.key, required this.onDeleteFile, required this.fileId});
+  const DeleteFilePopUp({super.key, required this.onDeleteFile, required this.fileId, required this.secretKey});
 
   @override
   State<StatefulWidget> createState() {
@@ -71,7 +73,7 @@ class DeleteFilePopUpState extends State<DeleteFilePopUp> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5)
       ),
-      title: Text("Delete ${file?.title}", style: FormTitleTxtStyle.classic(20, ColorPalette.getWhite(1)),),
+      title: Text("Delete ${widget.secretKey.isNotEmpty? EncryptionService.decode(file?.title?? "", widget.secretKey) : file?.title}", style: FormTitleTxtStyle.classic(20, ColorPalette.getWhite(1)),),
       content: SizedBox(
         height: 60,
         child: Center(

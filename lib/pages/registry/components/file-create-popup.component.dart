@@ -4,12 +4,14 @@ import 'package:crypt/common/values.dart';
 import 'package:crypt/models/collection.model.dart';
 import 'package:crypt/providers/secret_key.provider.dart';
 import 'package:crypt/services/database.dart';
+import 'package:crypt/services/encryption.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CreateFilePopUp extends StatefulWidget {
   final void Function() onCreateFile;
-  const CreateFilePopUp({super.key, required this.onCreateFile});
+  final String secretKey;
+  const CreateFilePopUp({super.key, required this.onCreateFile, required this.secretKey});
 
   @override
   State<StatefulWidget> createState() {
@@ -19,7 +21,7 @@ class CreateFilePopUp extends StatefulWidget {
 }
 
 class CreateFilePopUpState extends State<CreateFilePopUp> {
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool shouldCreateNewCollection = false;
   Collection? selectedCollection;
   late TextEditingController fileTitleController;
@@ -81,7 +83,7 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
             Navigator.of(context).pop();
             if(shouldCreateNewCollection){
               try{
-                int collectionId = await DbService.addCollection((name: collectionNameController.value.text), Provider.of<SecretKeyProvider>(context, listen: false).value);
+                int collectionId = await DbService.addCollection((name: collectionNameController.value.text), widget.secretKey);
                 await DbService.addFile((title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: collectionId), Provider.of<SecretKeyProvider>(context, listen: false).value);
               } catch(e){
                   print(e);
@@ -93,7 +95,7 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
             }
             else {
               try{
-                await DbService.addFile((title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: selectedCollection!.id), Provider.of<SecretKeyProvider>(context, listen: false).value);
+                await DbService.addFile((title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: selectedCollection!.id), widget.secretKey);
               } catch(e){
                 print(e);
                 //
@@ -199,7 +201,7 @@ class CreateFilePopUpState extends State<CreateFilePopUp> {
                   dropdownColor: ColorPalette.getBlack(0.9),
                   items: shouldCreateNewCollection? [] : collections.map((collection) => DropdownMenuItem<Collection>(
                     value: collection,
-                    child: Text(collection.name, style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),)),
+                    child: Text(widget.secretKey.isNotEmpty? EncryptionService.decode(collection.name, widget.secretKey) : collection.name, style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),)),
                   ).toList(),
                   value: selectedCollection,
                   onChanged: (collection){

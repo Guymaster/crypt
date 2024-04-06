@@ -2,13 +2,15 @@ import 'package:crypt/common/styles.dart';
 import 'package:crypt/common/values.dart';
 import 'package:crypt/models/collection.model.dart';
 import 'package:crypt/services/database.dart';
+import 'package:crypt/services/encryption.dart';
 import 'package:flutter/material.dart';
 import 'package:crypt/models/file.model.dart';
 
 class DeleteCollectionPopUp extends StatefulWidget {
   final void Function() onDeleteCollection;
   final int collectionId;
-  const DeleteCollectionPopUp({super.key, required this.onDeleteCollection, required this.collectionId});
+  final String secretKey;
+  const DeleteCollectionPopUp({super.key, required this.onDeleteCollection, required this.collectionId, required this.secretKey});
 
   @override
   State<StatefulWidget> createState() {
@@ -84,7 +86,7 @@ class DeleteCollectionPopUpState extends State<DeleteCollectionPopUp> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5)
       ),
-      title: Text("Delete ${collection?.name}", style: FormTitleTxtStyle.classic(20, ColorPalette.getWhite(1)),),
+      title: Text("Delete ${widget.secretKey.isNotEmpty? EncryptionService.decode(collection?.name?? "", widget.secretKey) : collection?.name}", style: FormTitleTxtStyle.classic(20, ColorPalette.getWhite(1)),),
       content: SizedBox(
         height: 150,
         child: Form(
@@ -96,7 +98,7 @@ class DeleteCollectionPopUpState extends State<DeleteCollectionPopUp> {
               const SizedBox(height: 20,),
               TextFormField(
                 validator: (v){
-                  if(v == null || v.isEmpty || collection == null || v != collection?.name){
+                  if(v == null || v.isEmpty || collection == null || v != (widget.secretKey.isNotEmpty? EncryptionService.decode(collection?.name?? "", widget.secretKey) : collection?.name)){
                     return "Please write the collection name correctly";
                   }
                   return null;
@@ -107,7 +109,7 @@ class DeleteCollectionPopUpState extends State<DeleteCollectionPopUp> {
                     fillColor: ColorPalette.getBlack(0.5),
                     hoverColor: ColorPalette.getBlack(0.5),
                     labelText: "Type the collection name here",
-                    hintText: collection?.name,
+                    hintText: widget.secretKey.isNotEmpty? EncryptionService.decode(collection?.name?? "", widget.secretKey) : collection?.name,
                     hintStyle: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.3)),
                     labelStyle: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),
                     border: InputBorder.none

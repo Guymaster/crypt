@@ -4,6 +4,7 @@ import 'package:crypt/common/values.dart';
 import 'package:crypt/models/collection.model.dart';
 import 'package:crypt/models/file.model.dart';
 import 'package:crypt/services/database.dart';
+import 'package:crypt/services/encryption.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +14,8 @@ class EditFilePopUp extends StatefulWidget {
   final void Function() onEditFile;
   final int fileId;
   final int? defaultCollectionId;
-  const EditFilePopUp({super.key, required this.onEditFile, required this.fileId, this.defaultCollectionId});
+  final String secretKey;
+  const EditFilePopUp({super.key, required this.onEditFile, required this.fileId, this.defaultCollectionId, required this.secretKey});
 
   @override
   State<StatefulWidget> createState() {
@@ -23,7 +25,7 @@ class EditFilePopUp extends StatefulWidget {
 }
 
 class EditFilePopUpState extends State<EditFilePopUp> {
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   File? defaultFileData;
   
   bool shouldCreateNewCollection = false;
@@ -46,8 +48,8 @@ class EditFilePopUpState extends State<EditFilePopUp> {
     File f = await DbService.getFileById(widget.fileId);
     setState(() {
       defaultFileData = f;
-      fileTitleController.text = f.title;
-      fileContentController.text = f.content;
+      fileTitleController.text = widget.secretKey.isNotEmpty? EncryptionService.decode(f.title, widget.secretKey) : f.title;
+      fileContentController.text = widget.secretKey.isNotEmpty? EncryptionService.decode(f.content, widget.secretKey) : f.content;
       selectedCollection = collections.firstWhere((element) => element.id == f.collectionId);
       shouldCreateNewCollection = false;
     });
@@ -99,8 +101,8 @@ class EditFilePopUpState extends State<EditFilePopUp> {
             Navigator.of(context).pop();
             if(shouldCreateNewCollection){
               try{
-                int collectionId = await DbService.addCollection((name: collectionNameController.value.text), Provider.of<SecretKeyProvider>(context, listen: false).value);
-                await DbService.updateFile(widget.fileId, (title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: collectionId), Provider.of<SecretKeyProvider>(context, listen: false).value);
+                int collectionId = await DbService.addCollection((name: collectionNameController.value.text), widget.secretKey);
+                await DbService.updateFile(widget.fileId, (title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: collectionId), widget.secretKey);
               } catch(e){
                   print(e);
                 //
@@ -111,7 +113,7 @@ class EditFilePopUpState extends State<EditFilePopUp> {
             }
             else {
               try{
-                await DbService.updateFile(widget.fileId, (title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: selectedCollection!.id), Provider.of<SecretKeyProvider>(context, listen: false).value);
+                await DbService.updateFile(widget.fileId, (title: fileTitleController.value.text, content: fileContentController.value.text, collectionId: selectedCollection!.id), widget.secretKey);
               } catch(e){
                 print(e);
                 //
@@ -128,7 +130,7 @@ class EditFilePopUpState extends State<EditFilePopUp> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(5)
       ),
-      title: Text("Edit ${defaultFileData?.title}", style: FormTitleTxtStyle.classic(20, ColorPalette.getWhite(1)),),
+      title: Text("Edit ${widget.secretKey.isNotEmpty? EncryptionService.decode(defaultFileData?.title?? "", widget.secretKey) : defaultFileData?.title}", style: FormTitleTxtStyle.classic(20, ColorPalette.getWhite(1)),),
       content: SizedBox(
         width: 600,
         child: SingleChildScrollView(
@@ -217,7 +219,7 @@ class EditFilePopUpState extends State<EditFilePopUp> {
                   dropdownColor: ColorPalette.getBlack(0.9),
                   items: shouldCreateNewCollection? [] : collections.map((collection) => DropdownMenuItem<Collection>(
                     value: collection,
-                    child: Text(collection.name, style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),)),
+                    child: Text(widget.secretKey.isNotEmpty? EncryptionService.decode(collection.name, widget.secretKey) : collection.name, style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),)),
                   ).toList(),
                   value: selectedCollection,
                   onChanged: (collection){

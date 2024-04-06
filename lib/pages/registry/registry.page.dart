@@ -89,6 +89,7 @@ class RegistryPageState extends State<RegistryPage> {
               context: context,
               builder: (context){
                 return CreateFilePopUp(
+                  secretKey: Provider.of<SecretKeyProvider>(context).value,
                   onCreateFile: (){
                     fetchCollections();
                   },
@@ -233,21 +234,24 @@ class RegistryPageState extends State<RegistryPage> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
-                              child: CollectionItem(
-                                onPressed: (String name){
-                                  setState(() {
-                                    selectedCol = i;
-                                  });
-                                  fetchFiles();
-                                },
-                                handleEdit: (c) async {
+                              child: Consumer<SecretKeyProvider>(
+                                builder: (context, secretKeyProvider, _) => CollectionItem(
+                                  secretKey: secretKeyProvider.value,
+                                  onPressed: (String name){
+                                    setState(() {
+                                      selectedCol = i;
+                                    });
+                                    fetchFiles();
+                                  },
+                                  handleEdit: (c) async {
                                     fetchCollections();
-                                },
-                                handleDelete: (c) async {
-                                  fetchCollections();
-                                },
-                                collection: collections[i],
-                                selected: (i == selectedCol),
+                                  },
+                                  handleDelete: (c) async {
+                                    fetchCollections();
+                                  },
+                                  collection: collections[i],
+                                  selected: (i == selectedCol),
+                                ),
                               ),
                             ),
                           ],
@@ -267,6 +271,7 @@ class RegistryPageState extends State<RegistryPage> {
                               context: context,
                               builder: (context){
                                 return DeleteFilePopUp(
+                                  secretKey: Provider.of<SecretKeyProvider>(context).value,
                                   onDeleteFile: (){
                                     fetchCollections();
                                   }, fileId: file.id,
@@ -279,6 +284,7 @@ class RegistryPageState extends State<RegistryPage> {
                               context: context,
                               builder: (context){
                                 return EditFilePopUp(
+                                  secretKey: Provider.of<SecretKeyProvider>(context).value,
                                   defaultCollectionId: selectedCol,
                                   onEditFile: (){
                                     fetchCollections();
