@@ -6,6 +6,8 @@ const HIVE_BOX_NAME = "CRYPT_BOX";
 const WINDOW_HEADER_HEIGHT = 30;
 const WINDOW_SIDEBAR_WIDTH = 200;
 
+const BUY_ME_A_COFFEE_URL = "https://www.buymeacoffee.com/guyrogerthl";
+
 enum ItemMode {
   VIEW,
   EDIT,

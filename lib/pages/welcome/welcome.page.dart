@@ -3,7 +3,6 @@ import 'package:crypt/common/values.dart';
 import 'package:crypt/pages/registry/registry.page.dart';
 import 'package:crypt/services/database.dart';
 import 'package:crypt/services/encryption.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

@@ -3,6 +3,7 @@ import 'package:crypt/common/themes.dart';
 import 'package:crypt/pages/welcome/welcome.page.dart';
 import 'package:crypt/pages/registry/registry.page.dart';
 import 'package:crypt/providers/secret_key.provider.dart';
+import 'package:crypt/providers/user_preferences.provider.dart';
 import 'package:crypt/services/database.dart';
 import 'package:crypt/services/encryption.dart';
 import 'package:flutter/material.dart';
@@ -28,9 +29,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => SecretKeyProvider(),
-      builder: (context, widget) => MaterialApp(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => SecretKeyProvider()
+        ),
+        ChangeNotifierProvider(
+            create: (context) => UserPreferencesProvider()
+        ),
+      ],
+      builder: (context, _) => MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: AppTheme,

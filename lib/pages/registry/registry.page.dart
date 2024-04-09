@@ -4,6 +4,7 @@ import 'package:crypt/common/styles.dart';
 import 'package:crypt/common/values.dart';
 import 'package:crypt/pages/registry/components/collection-item.component.dart';
 import 'package:crypt/pages/registry/components/file-create-popup.component.dart';
+import 'package:crypt/pages/settings/settings.page.dart';
 import 'package:crypt/pages/welcome/welcome.page.dart';
 import 'package:crypt/providers/secret_key.provider.dart';
 import 'package:crypt/services/database.dart';
@@ -168,6 +169,16 @@ class RegistryPageState extends State<RegistryPage> {
                         ],
                       ),
                     ),
+                    IconButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all(const RoundedRectangleBorder())
+                        ),
+                        onPressed: (){
+                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SettingsPage()));
+                        },
+                      iconSize: 15,
+                        icon: Icon(Icons.settings, color: ColorPalette.getWhite(0.4),),
+                        ),
                     Flexible(
                       child: Container(color: ColorPalette.getBlack(0),),
                     ),
