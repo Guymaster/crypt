@@ -143,9 +143,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         showDialog(
                             context: context,
                             builder: (context){
-                              return ChangeSecretKeyPopUp(secretKey: Provider.of<SecretKeyProvider>(context).value);
+                              return ChangeSecretKeyPopUp(secretKey: Provider.of<SecretKeyProvider>(context, listen: false).value);
                             }
-                        );
+                        ).whenComplete(() => Provider.of<SecretKeyProvider>(context, listen: false).value = "");
                       },
                       child: Text("Change Secret Key", style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(1),),
                     ),),

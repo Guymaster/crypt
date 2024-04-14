@@ -192,7 +192,7 @@ abstract class DbService {
   }) data, String key) async {
     final Database db = await getDb();
     await db.update("file", {
-      "titile": EncryptionService.encode(data.title, key),
+      "title": EncryptionService.encode(data.title, key),
       "content": EncryptionService.encode(data.content, key),
       "collection_id": data.collectionId,
       "updated_at": DateTime.now().millisecondsSinceEpoch
@@ -238,5 +238,94 @@ abstract class DbService {
       "updated_at": DateTime.now().millisecondsSinceEpoch
     }, where: "key='hash'"
     );
+  }
+
+  static Future<bool> changeSecret(String newSecretKey, String key) async {
+    final Database db = await getDb();
+    final bool success = await db.transaction<bool>((txn) async {
+      String? hash = await (() async {
+        final List<Map<String, Object?>> settingMaps = await txn.query("setting",
+            where: "key='hash'"
+        );
+        List<({String key, String value})> settings = [
+          for (final {
+          'key': key as String,
+          'value': value as String,
+          } in settingMaps)
+            (key: key, value: value),
+        ];
+        return settings.isEmpty? null : settings[0].value;
+      })();
+      
+      bool access = EncryptionService.check(key, hash?? "");
+      if(hash == null || !access){
+        throw Exception();
+      }
+
+      String h = EncryptionService.generateHash(newSecretKey).hash;
+      await txn.update("setting", {
+        "value": h,
+        "updated_at": DateTime.now().millisecondsSinceEpoch
+      }, where: "key='hash'"
+      );
+
+      //Update files
+      final List<Map<String, Object?>> fileMaps = await txn.query("file");
+      List<File> oldFiles = [
+        for (final {
+        'id': id as int,
+        'title': title as String,
+        'content': content as String,
+        'collection_id': collection_id as int,
+        'created_at': created_at as int,
+        'updated_at': updated_at as int
+        } in fileMaps)
+          File(
+              id: id,
+              title: EncryptionService.decode(title, key),
+              createdAt: created_at,
+              updatedAt: updated_at,
+              collectionId: collection_id,
+              content: EncryptionService.decode(content, key)
+          ),
+      ];
+      for (File f in oldFiles) {
+        await txn.update("file", {
+          "title": EncryptionService.encode(f.title, newSecretKey),
+          "content": EncryptionService.encode(f.content, newSecretKey),
+          "updated_at": DateTime.now().millisecondsSinceEpoch
+        }, where: "id=${f.id}"
+        );
+      }
+
+      //Update collections
+      final List<Map<String, Object?>> collectionMaps = await txn.query("collection");
+      List<Collection> oldCollections = [
+        for (final {
+        'id': id as int,
+        'name': name as String,
+        'created_at': created_at as int,
+        'updated_at': updated_at as int
+        } in collectionMaps)
+          Collection(
+            id: id,
+            name: EncryptionService.decode(name, key),
+            createdAt: created_at,
+            updatedAt: updated_at,
+          ),
+      ];
+      for (Collection c in oldCollections) {
+        await txn.update("collection", {
+          "name": EncryptionService.encode(c.name, newSecretKey),
+          "updated_at": DateTime.now().millisecondsSinceEpoch
+        }, where: "id=${c.id}"
+        );
+      }
+      return true;
+    });
+    if(!success){
+      throw Exception();
+    }
+    return true;
   }
 }

@@ -161,7 +161,7 @@ class RegistryPageState extends State<RegistryPage> {
                                       }
                                   )
                                 :
-                                Provider.of<SecretKeyProvider>(context, listen: false).value = "";
+                                  Provider.of<SecretKeyProvider>(context, listen: false).value = "";
                               },
                               icon: Icon((provider.value.isEmpty? Icons.lock : Icons.lock_open))
                             ),
@@ -169,16 +169,21 @@ class RegistryPageState extends State<RegistryPage> {
                         ],
                       ),
                     ),
-                    IconButton(
-                        style: ButtonStyle(
-                            shape: MaterialStateProperty.all(const RoundedRectangleBorder())
-                        ),
-                        onPressed: (){
-                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SettingsPage()));
-                        },
-                      iconSize: 15,
-                        icon: Icon(Icons.settings, color: ColorPalette.getWhite(0.4),),
-                        ),
+                    Consumer<SecretKeyProvider>(
+                      builder: (context, secreKeyProvider, _) => IconButton(
+                          style: ButtonStyle(
+                              shape: MaterialStateProperty.all(const RoundedRectangleBorder())
+                          ),
+                          onPressed: (){
+                            if(secreKeyProvider.value.isEmpty) {
+                              return;
+                            }
+                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const SettingsPage()));
+                          },
+                        iconSize: 15,
+                          icon: Icon(Icons.settings, color: secreKeyProvider.value.isNotEmpty? ColorPalette.getWhite(0.4) : ColorPalette.getWhite(0.1),),
+                          ),
+                    ),
                     Flexible(
                       child: Container(color: ColorPalette.getBlack(0),),
                     ),
