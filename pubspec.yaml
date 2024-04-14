@@ -48,6 +48,7 @@ dependencies:
   encrypt_decrypt_plus: ^1.1.0
   url_launcher: ^6.2.5
   file_picker: ^8.0.0+1
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
