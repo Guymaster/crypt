@@ -1,11 +1,15 @@
+import 'dart:io';
+
 import 'package:crypt/common/styles.dart';
 import 'package:crypt/common/values.dart';
+import 'package:crypt/models/backup.model.dart';
 import 'package:crypt/models/collection.model.dart';
 import 'package:crypt/providers/secret_key.provider.dart';
 import 'package:crypt/services/database.dart';
 import 'package:crypt/services/encryption.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:crypt/models/file.model.dart';
+import 'package:crypt/models/file.model.dart' as F;
 import 'package:provider/provider.dart';
 
 class ImportDataPopUp extends StatefulWidget {
@@ -22,17 +26,15 @@ class ImportDataPopUp extends StatefulWidget {
 
 class UnlockPopUpState extends State<ImportDataPopUp> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late TextEditingController textEditingController;
+  PlatformFile? selectedFile;
 
   @override
   void initState() {
     super.initState();
-    textEditingController = TextEditingController();
   }
 
   @override
   void dispose() {
-    textEditingController.dispose();
     super.dispose();
   }
 
@@ -44,50 +46,51 @@ class UnlockPopUpState extends State<ImportDataPopUp> {
         borderRadius: BorderRadius.circular(5)
       ),
       title: Text("Import Data", style: FormTitleTxtStyle.classic(20, ColorPalette.getWhite(1)),),
+        actions: [
+          TextButton(
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5)
+                ))
+            ),
+            onPressed: () async {
+              File sysFile = File(selectedFile?.path??"");
+              Backup b = Backup.fromJson(sysFile.readAsStringSync());
+              await b.saveToDb(Provider.of<SecretKeyProvider>(context, listen: false).value);
+            },
+            child: Text("Encrypt & Save", style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(0.7)),),
+          )
+        ],
       content: SizedBox(
-        height: 120,
+        height: 100,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 10,),
-            Form(
-              key: _formKey,
-              child: TextFormField(
-                controller: textEditingController,
-                obscureText: true,
-                obscuringCharacter: "漢",
-                textAlign: TextAlign.center,
-                textInputAction: TextInputAction.next,
-                onFieldSubmitted: (value) async {
-                  bool isValid = _formKey.currentState != null? _formKey.currentState!.validate() : false;
-                  textEditingController.text = "";
-                  if(!isValid) return;
-                  String hash = await DbService.getHash()?? "";
-                  bool isPasswordCorrect = EncryptionService.check(value, hash);
-                  if(isPasswordCorrect){
-                    Provider.of<SecretKeyProvider>(context, listen: false).value = value;
-                  }
-                  Navigator.of(context).pop();
-                },
-                style: FormLabelTxtStyle.classic(17, ColorPalette.getWhite(0.7)),
-                validator: (value){
-                  if(value == null || value.isEmpty) {
-                    return "Where is the secret key?";
-                  }
-                },
-                autofocus: true,
-                decoration: InputDecoration(
-                    errorMaxLines: 2,
-                    errorStyle: FormLabelTxtStyle.classic(14, Colors.deepOrange),
-                    filled: true,
-                    labelText: "Type your secret key",
-                    fillColor: ColorPalette.getBlack(0.5),
-                    hoverColor: ColorPalette.getBlack(0.5),
-                    hintText: "Remember it. Remember...",
-                    border: InputBorder.none
-                ),
+            TextButton(
+              style: ButtonStyle(
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)
+                  ))
               ),
-            )
+              onPressed: () async {
+                FilePickerResult? result = await FilePicker.platform.pickFiles(
+                  type: FileType.custom,
+                  allowedExtensions: ['json'],
+                );
+                if(result == null) return;
+                setState(() {
+                  selectedFile = result?.files.first;
+                });
+              },
+              child: Row(
+                children: [
+                  const Icon(Icons.folder),
+                  const SizedBox(width: 5,),
+                  Text(selectedFile != null? selectedFile?.name??"Choose a file" : "Choose a file", style: FormLabelTxtStyle.classic(14, ColorPalette.getWhite(1),),
+                  ),
+                ],
+              ),),
           ],
         ),
       )

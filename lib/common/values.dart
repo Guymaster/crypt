@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const APP_VERSION = "1.0.0";
+
 const HIVE_COLL_NAME = "CRYPT_HIVE";
 const HIVE_BOX_NAME = "CRYPT_BOX";
 
